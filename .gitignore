@@ -1,0 +1,5 @@
+*.d
+*.o
+.clangd/
+compile_commands.json
+tags
