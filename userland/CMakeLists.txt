@@ -18,10 +18,16 @@ function(add_userland_executable)
 endfunction()
 
 add_userland_executable(NAME shell SOURCES shell/main.cpp)
-add_userland_executable(NAME init SOURCES init/main.cpp)
-add_userland_executable(NAME cat SOURCES cat/main.cpp)
-add_userland_executable(NAME ls SOURCES ls/main.cpp)
 target_link_libraries(shell ${LIBCORE_TARGET})
+
+add_userland_executable(NAME init SOURCES init/main.cpp)
 target_link_libraries(init ${LIBCORE_TARGET})
+
+add_userland_executable(NAME cat SOURCES cat/main.cpp)
 target_link_libraries(cat ${LIBCORE_TARGET})
+
+add_userland_executable(NAME ls SOURCES ls/main.cpp)
 target_link_libraries(ls ${LIBCORE_TARGET})
+
+add_userland_executable(NAME test-graphics SOURCES test-graphics/main.cpp)
+target_link_libraries(test-graphics ${LIBCORE_TARGET})

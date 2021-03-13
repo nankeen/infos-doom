@@ -1,39 +1,62 @@
 /* SPDX-License-Identifier: MIT */
+/**
+ * MIT License
+ * 
+ * Copyright (c) 2018 Tom Spink
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
 
 #pragma once
 
-typedef unsigned char			uint8_t;
-typedef unsigned short			uint16_t;
-typedef unsigned int			uint32_t;
-typedef unsigned long long int	uint64_t;
+typedef unsigned char           uint8_t;
+typedef unsigned short          uint16_t;
+typedef unsigned int            uint32_t;
+typedef unsigned long long int  uint64_t;
 
-typedef signed char				int8_t;
-typedef signed short			int16_t;
-typedef signed int				int32_t;
-typedef signed long long int	int64_t;
+typedef signed char             int8_t;
+typedef signed short            int16_t;
+typedef signed int              int32_t;
+typedef signed long long int    int64_t;
 
-typedef unsigned long	size_t;
-typedef unsigned long	off_t;
-typedef unsigned long	uintptr_t;
-typedef signed long		intptr_t;
+typedef unsigned long   size_t;
+typedef unsigned long   off_t;
+typedef unsigned long   uintptr_t;
+typedef signed long     intptr_t;
 
-typedef signed long int		intmax_t;
-typedef unsigned long int	uintmax_t;
+typedef signed long int     intmax_t;
+typedef unsigned long int   uintmax_t;
 
 #define ARRAY_SIZE(_arr) (sizeof(_arr) / sizeof(_arr[0]))
 
 #define SYS_NOP             0x00
-#define SYS_YIELD	        0x01
-#define SYS_EXIT	        0x02
-#define SYS_OPEN	        0x03
-#define SYS_CLOSE	        0x04
-#define SYS_READ	        0x05
-#define SYS_WRITE	        0x06
+#define SYS_YIELD           0x01
+#define SYS_EXIT            0x02
+#define SYS_OPEN            0x03
+#define SYS_CLOSE           0x04
+#define SYS_READ            0x05
+#define SYS_WRITE           0x06
 #define SYS_OPENDIR         0x07
 #define SYS_READDIR         0x08
 #define SYS_CLOSEDIR        0x09
 #define SYS_EXEC            0x0a
-#define SYS_WAIT_PROC	    0x0b
+#define SYS_WAIT_PROC       0x0b
 #define SYS_CREATE_THREAD   0x0c
 #define SYS_STOP_THREAD     0x0d
 #define SYS_JOIN_THREAD     0x0e
@@ -63,12 +86,13 @@ extern HFILE open(const char *filename, int flags);
 extern int read(HFILE file, char *buffer, size_t size);
 extern int write(HFILE file, const char *buffer, size_t size);
 extern void close(HFILE file);
+extern void *mmap(void *addr, size_t len, int flags, HFILE fd, off_t offset);
 
 struct dirent
 {
-	char name[64];
-	unsigned int size;
-	int flags;
+    char name[64];
+    unsigned int size;
+    int flags;
 };
 
 extern HDIR opendir(const char *path, int flags);
@@ -77,6 +101,7 @@ extern void closedir(HDIR dir);
 
 extern HPROC exec(const char *filename, const char *args);
 extern void wait_proc(HPROC proc);
+extern void system(const char *command);
 
 typedef void (*ThreadProc)(void *);
 extern HTHREAD create_thread(ThreadProc tp, void *arg);
@@ -85,7 +110,7 @@ extern void join_thread(HTHREAD thread);
 extern void usleep(unsigned long us);
 
 struct tod {
-	unsigned short seconds, minutes, hours, day_of_month, month, year;
+    unsigned short seconds, minutes, hours, day_of_month, month, year;
 };
 
 extern int get_time_of_day(struct tod *t);
