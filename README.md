@@ -26,3 +26,28 @@ The two main hurdles as of 12 Mar 2021 are:
 - [ ] Implement frame drawing function in Doom.
 - [ ] Implement player input functions in Doom.
 - [ ] Add mouse device support (optional).
+
+## Build
+
+The InfOS project builds with a Makefile.
+This project builds the kernel with the original Makefile but uses CMake for other binaries.
+To build and generate the a bootable ISO, you would also need GRUB.
+
+Install the dependencies on Ubuntu (ninja is optional)
+
+```bash
+sudo apt install grub2 xorriso build-essential ninja
+```
+
+Build with CMake
+```bash
+mkdir build
+cd build
+cmake -G Ninja ..
+cmake --build . --target grub-bootable-iso rootfs
+```
+
+Run
+```bash
+./run.sh
+```
