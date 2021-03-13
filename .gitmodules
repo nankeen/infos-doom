@@ -1,6 +1,3 @@
 [submodule "infos"]
 	path = infos
 	url = git@github.com:nankeen/infos.git
-[submodule "infos-user"]
-	path = infos-user
-	url = git@github.com:nankeen/infos-user.git
