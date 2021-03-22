@@ -25,10 +25,9 @@ int main(const char *)
         exit(1);
     }
     printf("Mapped frame buffer at %p\n", frame_buffer);
-    while (1) {
-        for (size_t i = 0; i < V_WIDTH * V_HEIGHT; i++) {
-            frame_buffer[i] = -1;
-        }
+    for (size_t i = 0; i < V_WIDTH * V_HEIGHT; i++) {
+        frame_buffer[i] = -1;
     }
+    getch();
     return 0;
 }
