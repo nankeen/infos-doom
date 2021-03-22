@@ -50,13 +50,14 @@ if (NOT TAR_CMD)
 else()
     file (MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/rootfs)
     set(FS_TARGET rootfs)
-    set(FS_BINS init shell cat ls)
+    set(FS_BINS init shell cat ls test-graphics)
     set(FS_PATH ${CMAKE_BINARY_DIR}/rootfs.tar)
     add_custom_target(${FS_TARGET} ALL
         COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:init> ${CMAKE_BINARY_DIR}/rootfs
         COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:shell> ${CMAKE_BINARY_DIR}/rootfs
         COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:cat> ${CMAKE_BINARY_DIR}/rootfs
         COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:ls> ${CMAKE_BINARY_DIR}/rootfs
+        COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:test-graphics> ${CMAKE_BINARY_DIR}/rootfs
         COMMAND ${TAR_CMD} cf ${FS_PATH} -C ${CMAKE_BINARY_DIR}/rootfs ${FS_BINS})
 
     # Create qemu compile target

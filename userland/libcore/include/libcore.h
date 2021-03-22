@@ -62,7 +62,7 @@ typedef unsigned long int   uintmax_t;
 #define SYS_JOIN_THREAD     0x0e
 #define SYS_USLEEP          0x0f
 #define SYS_GET_TOD         0x10
-#define SYS_MMAP            0x16
+#define SYS_MMAP            0x15
 
 typedef unsigned long HANDLE;
 typedef HANDLE HFILE;
