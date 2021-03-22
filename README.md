@@ -36,7 +36,7 @@ To build and generate the a bootable ISO, you would also need GRUB.
 Install the dependencies on Ubuntu (ninja is optional)
 
 ```bash
-sudo apt install grub2 xorriso build-essential ninja
+sudo apt install grub2 xorriso build-essential ninja-build
 ```
 
 Build with CMake
