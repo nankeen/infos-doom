@@ -14,7 +14,7 @@ function(add_userland_executable)
 
     set_property(TARGET ${USERLAND_EXEC_NAME} PROPERTY CXX_STANDARD ${INFOS_CXX_STANDARD})
     set_property(TARGET ${USERLAND_EXEC_NAME} PROPERTY LINK_FLAGS
-            " -O3 -nostdlib -static -nostdinc")
+            "-O3 -nostdlib -nostdinc -static")
 endfunction()
 
 add_userland_executable(NAME shell SOURCES shell/main.cpp)
@@ -31,3 +31,20 @@ target_link_libraries(ls ${LIBCORE_TARGET})
 
 add_userland_executable(NAME test-graphics SOURCES test-graphics/main.cpp)
 target_link_libraries(test-graphics ${LIBCORE_TARGET})
+
+set(NEWLIB_TARGET x86_64-elf-infos CACHE STRING "Newlib target")
+
+ExternalProject_Add(newlib
+    GIT_REPOSITORY https://github.com/nankeen/infos-newlib
+    GIT_TAG newlib-infos
+    GIT_SHALLOW true
+    # PATCH_COMMAND ${NEWLIB_PATCH}
+    BUILD_IN_SOURCE 0
+    SOURCE_DIR ${THIRD_PARTY_DIR}/newlib
+    CONFIGURE_COMMAND
+        CFLAGS_FOR_TARGET=-ffreestanding
+        ${THIRD_PARTY_DIR}/newlib/configure
+            --prefix=${TARGET_SYSROOT}
+            --target=${NEWLIB_TARGET}
+            --disable-multilibs
+)
