@@ -9,46 +9,22 @@ include(ExternalProject)
 set(TARGET_SYSROOT ${CMAKE_BINARY_DIR}/rootfs)
 file(MAKE_DIRECTORY ${TARGET_SYSROOT})
 
-if(NOT THIRD_PARTY_DIR)
-    set(THIRD_PARTY_DIR ${CMAKE_SOURCE_DIR}/third_party CACHE PATH "Third party dir")
-endif()
-
-set(NEWLIB_TRIPLE x86_64-elf-infos CACHE STRING "Newlib target")
-set(NEWLIB_TARGET newlib)
-set(NEWLIB_INSTALL ${TARGET_SYSROOT}/${NEWLIB_TRIPLE})
-set(NEWLIB_INCLUDES ${NEWLIB_INSTALL}/include)
-set(NEWLIB_LIBS ${NEWLIB_INSTALL}/lib)
-if (EXISTS ${NEWLIB_INCLUDES})
-    add_custom_target(
-        ${NEWLIB_TARGET}
-        COMMAND echo "${NEWLIB_INCLUDES} exists, skipping rebuild"
-    )
-else()
-    ExternalProject_Add(${NEWLIB_TARGET}
-        GIT_REPOSITORY https://github.com/nankeen/infos-newlib
-        GIT_TAG newlib-infos
-        GIT_SHALLOW true
-        UPDATE_COMMAND ""
-        # PATCH_COMMAND ${NEWLIB_PATCH}
-        BUILD_IN_SOURCE 0
-        SOURCE_DIR ${THIRD_PARTY_DIR}/newlib
-        CONFIGURE_COMMAND
-            CFLAGS_FOR_TARGET=-ffreestanding
-            ${THIRD_PARTY_DIR}/newlib/configure
-                --prefix=/
-                --target=${NEWLIB_TRIPLE}
-                --disable-multilibs
-        INSTALL_COMMAND     make DESTDIR=${TARGET_SYSROOT} install
-    )
-endif()
-
 # Set compilation flags
 set(WARNING_FLAGS -Wall -Wextra -Wshadow)
-set(COMMON_COMPILER_FLAGS -fno-builtin -fno-stack-protector -I${NEWLIB_INCLUDES} ${WARNING_FLAGS})
+set(COMMON_COMPILER_FLAGS -fno-builtin -fno-stack-protector ${WARNING_FLAGS})
 set(C_COMPILER_FLAGS ${COMMON_COMPILER_FLAGS})
 set(CXX_COMPILER_FLAGS ${COMMON_COMPILER_FLAGS} -fno-exceptions -fno-rtti)
 set(INFOS_CXX_STANDARD 20)
 set(CMAKE_C_STANDARD 11)
+
+# ===================================================
+#
+#
+#              Kernel Target and ISO
+#
+#
+# ===================================================
+
 
 # kernel target name
 set(KERNEL_TARGET infos-kernel)
@@ -65,9 +41,6 @@ add_custom_command(OUTPUT ${KERNEL_TARGET_OUT}
                    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/infos)
 add_custom_target(${KERNEL_TARGET} DEPENDS ${KERNEL_TARGET_OUT})
 
-# Add userland targets
-add_subdirectory(userland)
-
 # Define grub ISO target
 find_program(GRUB_MKRESCUE grub-mkrescue)
 if (NOT GRUB_MKRESCUE)
@@ -82,6 +55,55 @@ else ()
         COMMAND ${GRUB_MKRESCUE} -o ${ISO_PATH} ${CMAKE_BINARY_DIR}/isofiles
         DEPENDS ${KERNEL_TARGET})
 endif()
+
+# ===================================================
+#
+#
+#                   Build newlib
+#
+#
+# ===================================================
+
+set(NEWLIB_TRIPLE x86_64-elf-infos CACHE STRING "Newlib target")
+set(NEWLIB_TARGET newlib)
+set(NEWLIB_PREFIX /usr)
+set(NEWLIB_INSTALL ${CMAKE_BINARY_DIR}${NEWLIB_PREFIX}/${NEWLIB_TRIPLE})
+set(NEWLIB_INCLUDES ${NEWLIB_INSTALL}/include)
+set(NEWLIB_LIBS ${NEWLIB_INSTALL}/lib)
+if (EXISTS ${NEWLIB_INCLUDES})
+    add_custom_target(
+        ${NEWLIB_TARGET}
+        COMMAND echo "${NEWLIB_INCLUDES} exists, skipping rebuild"
+    )
+else()
+    ExternalProject_Add(${NEWLIB_TARGET}
+        GIT_REPOSITORY https://github.com/nankeen/infos-newlib
+        GIT_TAG newlib-infos
+        GIT_SHALLOW true
+        UPDATE_COMMAND ""
+        # PATCH_COMMAND ${NEWLIB_PATCH}
+        BUILD_IN_SOURCE 0
+		SOURCE_DIR ${CMAKE_SOURCE_DIR}/newlib
+        CONFIGURE_COMMAND
+            CFLAGS_FOR_TARGET=-ffreestanding
+			${CMAKE_SOURCE_DIR}/newlib/configure
+				--prefix=${NEWLIB_PREFIX}
+                --target=${NEWLIB_TRIPLE}
+                --disable-multilibs
+				INSTALL_COMMAND make DESTDIR=${CMAKE_BINARY_DIR} install
+    )
+endif()
+
+# ===================================================
+#
+#
+#              Userspace and rootfs
+#
+#
+# ===================================================
+
+# Add userland targets
+add_subdirectory(userland)
 
 # Define rootfs compile target
 find_program(TAR_CMD tar)
@@ -99,20 +121,4 @@ else()
         COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:test-graphics> ${TARGET_SYSROOT}
         COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:test_newlib> ${TARGET_SYSROOT}
         COMMAND ${TAR_CMD} cf ${FS_PATH} -C ${TARGET_SYSROOT} ${FS_BINS})
-
-    # Create qemu compile target
-    find_program(QEMU qemu-system-x86_64)
-    if (QEMU AND ISO_TARGET)
-        set(RUN_QEMU_TARGET run-qemu)
-        set(QEMU_ARGS -cdrom ${ISO_PATH} -m 6G -debugcon stdio -hda ${FS_PATH})
-        if (QEMU_USE_GDB)
-            set(QEMU_ARGS ${QEMU_ARGS} -s -S)
-        endif()
-        if (QEMU_USE_VNC)
-            set(QEMU_ARGS ${QEMU_ARGS} -display vnc=localhost:1337)
-        endif()
-
-        add_custom_target(${RUN_QEMU_TARGET} COMMAND ${QEMU} ${QEMU_ARGS})
-        add_dependencies(${RUN_QEMU_TARGET} ${ISO_TARGET})
-    endif ()
 endif()
