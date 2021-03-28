@@ -6,16 +6,49 @@ project(infos-doom VERSION 0.0.1 LANGUAGES C CXX ASM)
 
 include(ExternalProject)
 
+set(TARGET_SYSROOT ${CMAKE_BINARY_DIR}/rootfs)
+file(MAKE_DIRECTORY ${TARGET_SYSROOT})
+
+if(NOT THIRD_PARTY_DIR)
+    set(THIRD_PARTY_DIR ${CMAKE_SOURCE_DIR}/third_party CACHE PATH "Third party dir")
+endif()
+
+set(NEWLIB_TRIPLE x86_64-elf-infos CACHE STRING "Newlib target")
+set(NEWLIB_TARGET newlib)
+set(NEWLIB_INSTALL ${TARGET_SYSROOT}/${NEWLIB_TRIPLE})
+set(NEWLIB_INCLUDES ${NEWLIB_INSTALL}/include)
+set(NEWLIB_LIBS ${NEWLIB_INSTALL}/lib)
+if (EXISTS ${NEWLIB_INCLUDES})
+    add_custom_target(
+        ${NEWLIB_TARGET}
+        COMMAND echo "${NEWLIB_INCLUDES} exists, skipping rebuild"
+    )
+else()
+    ExternalProject_Add(${NEWLIB_TARGET}
+        GIT_REPOSITORY https://github.com/nankeen/infos-newlib
+        GIT_TAG newlib-infos
+        GIT_SHALLOW true
+        UPDATE_COMMAND ""
+        # PATCH_COMMAND ${NEWLIB_PATCH}
+        BUILD_IN_SOURCE 0
+        SOURCE_DIR ${THIRD_PARTY_DIR}/newlib
+        CONFIGURE_COMMAND
+            CFLAGS_FOR_TARGET=-ffreestanding
+            ${THIRD_PARTY_DIR}/newlib/configure
+                --prefix=/
+                --target=${NEWLIB_TRIPLE}
+                --disable-multilibs
+        INSTALL_COMMAND     make DESTDIR=${TARGET_SYSROOT} install
+    )
+endif()
+
 # Set compilation flags
-set(WARNING_FLAGS -Werror -Wall -Wextra -Wshadow)
-set(COMMON_COMPILER_FLAGS -ffreestanding -fno-builtin -fno-stack-protector ${WARNING_FLAGS})
+set(WARNING_FLAGS -Wall -Wextra -Wshadow)
+set(COMMON_COMPILER_FLAGS -fno-builtin -fno-stack-protector -I${NEWLIB_INCLUDES} ${WARNING_FLAGS})
 set(C_COMPILER_FLAGS ${COMMON_COMPILER_FLAGS})
 set(CXX_COMPILER_FLAGS ${COMMON_COMPILER_FLAGS} -fno-exceptions -fno-rtti)
 set(INFOS_CXX_STANDARD 20)
 set(CMAKE_C_STANDARD 11)
-
-set(TARGET_SYSROOT ${CMAKE_BINARY_DIR}/rootfs)
-file(MAKE_DIRECTORY ${TARGET_SYSROOT})
 
 # kernel target name
 set(KERNEL_TARGET infos-kernel)
@@ -28,13 +61,9 @@ set(CMAKE_MODULE_PATH "${CMAKE_MODULE_PATH}" "${CMAKE_SOURCE_DIR}")
 
 # Define kernel compile target
 add_custom_command(OUTPUT ${KERNEL_TARGET_OUT}
-    COMMAND make -C infos cc=${CMAKE_C_COMPILER} cxx=${CMAKE_CXX_COMPILER} objcopy=${CMAKE_OBJCOPY} ld=${CMAKE_LINKER} as=${CMAKE_AS}
-                   WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
+    COMMAND make cc=${CMAKE_C_COMPILER} cxx=${CMAKE_CXX_COMPILER} objcopy=${CMAKE_OBJCOPY} ld=${CMAKE_LINKER} as=${CMAKE_ASM_COMPILER}
+                   WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/infos)
 add_custom_target(${KERNEL_TARGET} DEPENDS ${KERNEL_TARGET_OUT})
-
-if(NOT THIRD_PARTY_DIR)
-    set(THIRD_PARTY_DIR ${CMAKE_BINARY_DIR}/third_party CACHE PATH "Third party dir")
-endif()
 
 # Add userland targets
 add_subdirectory(userland)
@@ -60,7 +89,7 @@ if (NOT TAR_CMD)
     message (WARNING "Unable to find `tar`. Filesystem generation will not be available.")
 else()
     set(FS_TARGET rootfs)
-    set(FS_BINS init shell cat ls test-graphics)
+    set(FS_BINS init shell cat ls test-graphics test_newlib)
     set(FS_PATH ${TARGET_SYSROOT}.tar)
     add_custom_target(${FS_TARGET} ALL
         COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:init> ${TARGET_SYSROOT}
@@ -68,6 +97,7 @@ else()
         COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:cat> ${TARGET_SYSROOT}
         COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:ls> ${TARGET_SYSROOT}
         COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:test-graphics> ${TARGET_SYSROOT}
+        COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:test_newlib> ${TARGET_SYSROOT}
         COMMAND ${TAR_CMD} cf ${FS_PATH} -C ${TARGET_SYSROOT} ${FS_BINS})
 
     # Create qemu compile target
