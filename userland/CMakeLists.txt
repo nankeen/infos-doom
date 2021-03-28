@@ -16,7 +16,7 @@ function(add_userland_executable)
     set_property(TARGET ${USERLAND_EXEC_NAME} PROPERTY CXX_STANDARD ${INFOS_CXX_STANDARD})
     set_property(TARGET ${USERLAND_EXEC_NAME} PROPERTY LINK_FLAGS
 				 "-O3 -nostdlib -nostdinc -static -L${NEWLIB_LIBS} ${NEWLIB_LIBS}/crt0.o")
-    target_link_libraries(test_newlib c g m nosys)
+			 target_link_libraries(${USERLAND_EXEC_NAME} c g m nosys)
 endfunction()
 
 function(add_core_executable)
@@ -51,4 +51,4 @@ target_link_libraries(ls ${LIBCORE_TARGET})
 add_core_executable(NAME test-graphics SOURCES test-graphics/main.cpp)
 target_link_libraries(test-graphics ${LIBCORE_TARGET})
 
-add_userland_executable(NAME test_newlib SOURCES test_newlib/main.cpp)
+add_userland_executable(NAME test-newlib SOURCES test-newlib/main.cpp)

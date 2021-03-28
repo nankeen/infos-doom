@@ -111,7 +111,7 @@ if (NOT TAR_CMD)
     message (WARNING "Unable to find `tar`. Filesystem generation will not be available.")
 else()
     set(FS_TARGET rootfs)
-    set(FS_BINS init shell cat ls test-graphics test_newlib)
+    set(FS_BINS init shell cat ls test-graphics test-newlib)
     set(FS_PATH ${TARGET_SYSROOT}.tar)
     add_custom_target(${FS_TARGET} ALL
         COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:init> ${TARGET_SYSROOT}
@@ -119,6 +119,6 @@ else()
         COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:cat> ${TARGET_SYSROOT}
         COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:ls> ${TARGET_SYSROOT}
         COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:test-graphics> ${TARGET_SYSROOT}
-        COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:test_newlib> ${TARGET_SYSROOT}
+        COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:test-newlib> ${TARGET_SYSROOT}
         COMMAND ${TAR_CMD} cf ${FS_PATH} -C ${TARGET_SYSROOT} ${FS_BINS})
 endif()
