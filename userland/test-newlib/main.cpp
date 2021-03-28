@@ -8,5 +8,7 @@ int main(int, const char *)
 	printf("Allocated buffer at: %p\n", allocated);
 	fflush(stdout);
 	*(allocated+0x20000) = 0;
+	free(allocated);
+	allocated = NULL;
     return 0;
 }
