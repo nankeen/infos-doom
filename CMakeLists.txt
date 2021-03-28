@@ -37,7 +37,7 @@ set(CMAKE_MODULE_PATH "${CMAKE_MODULE_PATH}" "${CMAKE_SOURCE_DIR}")
 
 # Define kernel compile target
 add_custom_command(OUTPUT ${KERNEL_TARGET_OUT}
-    COMMAND make cc=${CMAKE_C_COMPILER} cxx=${CMAKE_CXX_COMPILER} objcopy=${CMAKE_OBJCOPY} ld=${CMAKE_LINKER} as=${CMAKE_ASM_COMPILER}
+    			   COMMAND make
                    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/infos)
 add_custom_target(${KERNEL_TARGET} DEPENDS ${KERNEL_TARGET_OUT})
 
