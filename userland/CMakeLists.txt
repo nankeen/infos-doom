@@ -11,12 +11,12 @@ function(add_userland_executable)
 
     target_compile_options(${USERLAND_EXEC_NAME} PRIVATE
         $<$<COMPILE_LANGUAGE:C>:${C_COMPILER_FLAGS}>
-		$<$<COMPILE_LANGUAGE:CXX>:${CXX_COMPILER_FLAGS}> -I${NEWLIB_INCLUDES})
+        $<$<COMPILE_LANGUAGE:CXX>:${CXX_COMPILER_FLAGS}> -I${NEWLIB_INCLUDES})
 
     set_property(TARGET ${USERLAND_EXEC_NAME} PROPERTY CXX_STANDARD ${INFOS_CXX_STANDARD})
     set_property(TARGET ${USERLAND_EXEC_NAME} PROPERTY LINK_FLAGS
-				 "-O3 -nostdlib -nostdinc -static -L${NEWLIB_LIBS} ${NEWLIB_LIBS}/crt0.o")
-			 target_link_libraries(${USERLAND_EXEC_NAME} c g m nosys)
+                 "-O3 -nostdlib -nostdinc -static -L${NEWLIB_LIBS} ${NEWLIB_LIBS}/crt0.o")
+    target_link_libraries(${USERLAND_EXEC_NAME} c g m nosys)
 endfunction()
 
 function(add_core_executable)

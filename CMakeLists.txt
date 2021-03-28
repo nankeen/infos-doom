@@ -37,7 +37,7 @@ set(CMAKE_MODULE_PATH "${CMAKE_MODULE_PATH}" "${CMAKE_SOURCE_DIR}")
 
 # Define kernel compile target
 add_custom_command(OUTPUT ${KERNEL_TARGET_OUT}
-    			   COMMAND make
+                   COMMAND make
                    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/infos)
 add_custom_target(${KERNEL_TARGET} DEPENDS ${KERNEL_TARGET_OUT})
 
@@ -83,14 +83,14 @@ else()
         UPDATE_COMMAND ""
         # PATCH_COMMAND ${NEWLIB_PATCH}
         BUILD_IN_SOURCE 0
-		SOURCE_DIR ${CMAKE_SOURCE_DIR}/newlib
+        SOURCE_DIR ${CMAKE_SOURCE_DIR}/newlib
         CONFIGURE_COMMAND
             CFLAGS_FOR_TARGET=-ffreestanding
-			${CMAKE_SOURCE_DIR}/newlib/configure
-				--prefix=${NEWLIB_PREFIX}
+            ${CMAKE_SOURCE_DIR}/newlib/configure
+                --prefix=${NEWLIB_PREFIX}
                 --target=${NEWLIB_TRIPLE}
                 --disable-multilibs
-				INSTALL_COMMAND make DESTDIR=${CMAKE_BINARY_DIR} install
+                INSTALL_COMMAND make DESTDIR=${CMAKE_BINARY_DIR} install
     )
 endif()
 
