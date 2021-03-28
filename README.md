@@ -22,7 +22,7 @@ The two main hurdles as of 12 Mar 2021 are:
 - [x] Add multiboot framebuffer graphics support.
 - [x] Add memory mapped IO and user space page allocation with `mmap`.
 - [x] Add framebuffer console output and font rendering.
-- [ ] Add user space memory allocator.
+- [x] Add user space memory allocator.
 - [ ] Implement frame drawing function in Doom.
 - [ ] Implement player input functions in Doom.
 - [ ] Add mouse device support (optional).
