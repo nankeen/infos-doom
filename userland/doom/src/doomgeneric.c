@@ -43,7 +43,7 @@ void DG_Init()
         exit(1);
     }
     frame_buffer = (uint32_t *) mmap((void *)0xdeadbeef, V_STRIDE * V_HEIGHT, 1, fd, 0);
-    start_tick = 0;
+    start_tick = clock();
 }
 
 void DG_DrawFrame()
@@ -62,12 +62,11 @@ void DG_SleepMs(uint32_t ms)
 
 uint32_t DG_GetTicksMs()
 {
-    return clock();
+    return (clock() - start_tick) / 1e6;
 }
 
 int DG_GetKey(int* pressed, unsigned char* doom_key)
 {
-    printf("Get key pressed: %p doomKey: %p\n", pressed, doom_key);
     return 0;
 }
 
