@@ -1,7 +1,7 @@
 <h1 align="center">Doom on InfOS</h1>
 <p align="center">
-    <img alt="GitHub top language" src="https://img.shields.io/github/languages/top/nankeen/infos?style=for-the-badge">
-    <img alt="GitHub last commit" src="https://img.shields.io/github/last-commit/nankeen/infos?style=for-the-badge">
+    <img alt="GitHub top language" src="https://img.shields.io/github/languages/top/nankeen/infos-doom?style=for-the-badge">
+    <img alt="GitHub last commit" src="https://img.shields.io/github/last-commit/nankeen/infos-doom?style=for-the-badge">
     <img alt="GitHub issues" src="https://img.shields.io/github/issues/nankeen/infos-doom?style=for-the-badge">
 </p>
 
@@ -16,6 +16,10 @@ The two main hurdles as of 12 Mar 2021 are:
 
 1. Kernel currently uses VGA text mode and does not have framebuffer graphics.
 2. User space memory allocation is not supported.
+
+## Gallery
+
+![image](https://user-images.githubusercontent.com/6895854/112836924-1f9e6a80-9093-11eb-8af8-8bdf3102ec5b.png)
 
 ### Tasks
 
@@ -74,7 +78,7 @@ cmake -G Ninja ..
 cmake --build . --target grub-bootable-iso rootfs
 ```
 
-Run
+### Run
 ```bash
 ./run.sh
 ```
