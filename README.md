@@ -23,7 +23,7 @@ The two main hurdles as of 12 Mar 2021 are:
 - [x] Add memory mapped IO and user space page allocation with `mmap`.
 - [x] Add framebuffer console output and font rendering.
 - [x] Add user space memory allocator.
-- [ ] Implement frame drawing function in Doom.
+- [x] Implement frame drawing function in Doom.
 - [ ] Implement player input functions in Doom.
 - [ ] Add mouse device support (optional).
 
@@ -33,13 +33,40 @@ The InfOS project builds with a Makefile.
 This project builds the kernel with the original Makefile but uses CMake for other binaries.
 To build and generate the a bootable ISO, you would also need GRUB.
 
+### Requirements
+
 Install the dependencies on Ubuntu (ninja is optional)
 
 ```bash
 sudo apt install grub2 xorriso build-essential ninja-build
 ```
 
-Build with CMake
+### Toolchain setup
+
+This project would compile userspace binaries with a different compiler toolchain that needs setup.
+Follow https://wiki.osdev.org/GCC_Cross-Compiler to build this, we need to name it `x86_64-elf-infos-*`.
+
+On MacOS you can install `x86_64-elf-gcc` with Homebrew.
+
+```bash
+brew install x86_64-elf-gcc
+```
+
+Create a directory to store the toolchain, make sure that it is in your path.
+This is a quick hack to link the compiler with the correct name.
+
+```bash
+mkdir $HOME/opt/bin
+for elf_bin in /usr/local/bin/x86_64-elf-*
+    do ln $elf_bin ~/opt/bin/x86_64-elf-infos-${elf_bin##*x86_64-elf-}
+done
+export PATH="$HOME/opt/bin:$PATH"
+```
+
+### Build with CMake
+
+This might not be able to build the kernel due to an issue with the toolchain, so if it fails, try compiling the kernel first with `make -C infos/`.
+
 ```bash
 mkdir build
 cd build
