@@ -37,7 +37,7 @@ set(CMAKE_MODULE_PATH "${CMAKE_MODULE_PATH}" "${CMAKE_SOURCE_DIR}")
 
 # Define kernel compile target
 add_custom_command(OUTPUT ${KERNEL_TARGET_OUT}
-                   COMMAND make
+                   COMMAND make cc=${CMAKE_C_COMPILER} cxx=${CMAKE_CXX_COMPILER} objcopy=${CMAKE_OBJCOPY} ld=${CMAKE_LINKER} as=${CMAKE_ASM_COMPILER}
                    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/infos)
 add_custom_target(${KERNEL_TARGET} DEPENDS ${KERNEL_TARGET_OUT})
 
@@ -111,14 +111,25 @@ if (NOT TAR_CMD)
     message (WARNING "Unable to find `tar`. Filesystem generation will not be available.")
 else()
     set(FS_TARGET rootfs)
-    set(FS_BINS init shell cat ls test-graphics test-newlib)
+    set(FS_BINS
+        $<TARGET_FILE_NAME:init>
+        $<TARGET_FILE_NAME:shell>
+        $<TARGET_FILE_NAME:cat>
+        $<TARGET_FILE_NAME:ls>
+        $<TARGET_FILE_NAME:test-graphics>
+        $<TARGET_FILE_NAME:test-newlib>
+        $<TARGET_FILE_NAME:doom>)
+    set(FS_PATHS
+        $<TARGET_FILE:init>
+        $<TARGET_FILE:shell>
+        $<TARGET_FILE:cat>
+        $<TARGET_FILE:ls>
+        $<TARGET_FILE:test-graphics>
+        $<TARGET_FILE:test-newlib>
+        $<TARGET_FILE:doom>)
     set(FS_PATH ${TARGET_SYSROOT}.tar)
+    file(MAKE_DIRECTORY ${TARGET_SYSROOT}/.savegame)
     add_custom_target(${FS_TARGET} ALL
-        COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:init> ${TARGET_SYSROOT}
-        COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:shell> ${TARGET_SYSROOT}
-        COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:cat> ${TARGET_SYSROOT}
-        COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:ls> ${TARGET_SYSROOT}
-        COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:test-graphics> ${TARGET_SYSROOT}
-        COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:test-newlib> ${TARGET_SYSROOT}
-        COMMAND ${TAR_CMD} cf ${FS_PATH} -C ${TARGET_SYSROOT} ${FS_BINS})
+        COMMAND ${CMAKE_COMMAND} -E copy ${FS_PATHS} ${TARGET_SYSROOT}
+        COMMAND ${TAR_CMD} cf ${FS_PATH} -C ${TARGET_SYSROOT} ${FS_BINS} DOOM.WAD .savegame/)
 endif()
