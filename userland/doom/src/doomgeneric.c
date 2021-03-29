@@ -17,6 +17,8 @@ typedef HANDLE HFILE;
 #define V_WIDTH     1280
 #define V_HEIGHT    768
 #define V_STRIDE    V_WIDTH * 4
+#define GRAPHICS_START_X ((V_WIDTH - DOOMGENERIC_RESX) / 2)
+#define GRAPHICS_START_Y ((V_HEIGHT - DOOMGENERIC_RESY) / 2)
 
 static void *mmap(void *addr, size_t len, int flags, HFILE fd, size_t offset)
 {
@@ -50,7 +52,7 @@ void DG_DrawFrame()
 {
     for (size_t y = 0; y < DOOMGENERIC_RESY; y++) {
         for (size_t x = 0; x < DOOMGENERIC_RESX; x++) {
-            frame_buffer[y * V_WIDTH + x] = DG_ScreenBuffer[y * DOOMGENERIC_RESX + x];
+            frame_buffer[(y + GRAPHICS_START_Y) * V_WIDTH + (x + GRAPHICS_START_X)] = DG_ScreenBuffer[y * DOOMGENERIC_RESX + x];
         }
     }
 }
