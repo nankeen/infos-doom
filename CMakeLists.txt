@@ -70,29 +70,22 @@ set(NEWLIB_PREFIX /usr)
 set(NEWLIB_INSTALL ${CMAKE_BINARY_DIR}${NEWLIB_PREFIX}/${NEWLIB_TRIPLE})
 set(NEWLIB_INCLUDES ${NEWLIB_INSTALL}/include)
 set(NEWLIB_LIBS ${NEWLIB_INSTALL}/lib)
-if (EXISTS ${NEWLIB_INCLUDES})
-    add_custom_target(
-        ${NEWLIB_TARGET}
-        COMMAND echo "${NEWLIB_INCLUDES} exists, skipping rebuild"
-    )
-else()
-    ExternalProject_Add(${NEWLIB_TARGET}
-        GIT_REPOSITORY https://github.com/nankeen/infos-newlib
-        GIT_TAG newlib-infos
-        GIT_SHALLOW true
-        UPDATE_COMMAND ""
-        # PATCH_COMMAND ${NEWLIB_PATCH}
-        BUILD_IN_SOURCE 0
-        SOURCE_DIR ${CMAKE_SOURCE_DIR}/newlib
-        CONFIGURE_COMMAND
-            CFLAGS_FOR_TARGET=-ffreestanding
-            ${CMAKE_SOURCE_DIR}/newlib/configure
-                --prefix=${NEWLIB_PREFIX}
-                --target=${NEWLIB_TRIPLE}
-                --disable-multilibs
-                INSTALL_COMMAND make DESTDIR=${CMAKE_BINARY_DIR} install
-    )
-endif()
+ExternalProject_Add(${NEWLIB_TARGET}
+    GIT_REPOSITORY https://github.com/nankeen/infos-newlib
+    GIT_TAG newlib-infos
+    GIT_SHALLOW true
+    UPDATE_COMMAND ""
+    # PATCH_COMMAND ${NEWLIB_PATCH}
+    BUILD_IN_SOURCE 0
+    SOURCE_DIR ${CMAKE_SOURCE_DIR}/newlib
+    CONFIGURE_COMMAND
+        CFLAGS_FOR_TARGET=-ffreestanding
+        ${CMAKE_SOURCE_DIR}/newlib/configure
+            --prefix=${NEWLIB_PREFIX}
+            --target=${NEWLIB_TRIPLE}
+            --disable-multilibs
+            INSTALL_COMMAND make DESTDIR=${CMAKE_BINARY_DIR} install
+)
 
 # ===================================================
 #

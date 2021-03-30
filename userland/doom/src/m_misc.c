@@ -57,7 +57,6 @@ void M_MakeDirectory(char *path)
 #ifdef _WIN32
     mkdir(path);
 #else
-    printf("Trying to create path: %s\n", path);
     // Filesystem not writeable unfortunately
     // mkdir(path, 0755);
 #endif
