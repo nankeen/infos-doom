@@ -69,7 +69,7 @@ void system(const char *cmd)
     
     HPROC pcmd = exec(prog, cmd);
     if (is_error(pcmd)) {
-        printf("error: unable to run command '%s'\n", cmd);
+        printf("error: unable to run command %s '%s'\n", prog, cmd);
     } else {
         wait_proc(pcmd);
     }
