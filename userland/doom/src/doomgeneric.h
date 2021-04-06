@@ -9,7 +9,7 @@
 
 
 extern uint32_t* DG_ScreenBuffer;
-
+extern int should_exit;
 
 void DG_Init();
 void DG_DrawFrame();
