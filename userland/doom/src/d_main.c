@@ -73,6 +73,7 @@
 #include "statdump.h"
 
 #include "d_main.h"
+#include "doomgeneric.h"
 
 //
 // D-DoomLoop()
@@ -1080,6 +1081,7 @@ static void D_Endoom(void)
 
     I_Endoom(endoom);
 
+    should_exit = 1;
 	exit(0);
 }
 
