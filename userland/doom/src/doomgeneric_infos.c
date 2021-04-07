@@ -33,13 +33,51 @@ static unsigned short s_KeyQueue[KEYQUEUE_SIZE];
 static unsigned int s_KeyQueueWriteIndex = 0;
 static unsigned int s_KeyQueueReadIndex = 0;
 
-static char getch()
+static uint8_t scancode_map[] = {
+    0, KEY_ESCAPE,
+    '1', '2', '3', '4', '5', '6',
+    '7', '8', '9', '0',
+
+    KEY_MINUS, KEY_EQUALS, KEY_BACKSPACE, KEY_TAB,
+
+    'Q', 'W', 'E', 'R', 'T', 'Y',
+    'U', 'I', 'O', 'P', '[', ']',
+
+    KEY_ENTER,
+    KEY_FIRE,
+
+    'A', 'S', 'D', 'F', 'G', 'H',
+    'J', 'K', 'L', ';', '\'', '`',
+
+    KEY_RSHIFT,
+    '\\', 'Z', 'X', 'C', 'V', 'B',
+    'N', 'M', KEY_STRAFE_L, KEY_STRAFE_R, '/',
+
+    KEY_RSHIFT,
+    '*',
+    KEY_LALT,
+    KEY_USE,
+    KEY_CAPSLOCK,
+
+    KEY_F1,
+    KEY_F2,
+    KEY_F3,
+    KEY_F4,
+    KEY_F5,
+    KEY_F6,
+    KEY_F7,
+    KEY_F8,
+    KEY_F9,
+    KEY_F10,
+};
+
+static char getch(HFILE fd)
 {
     char buffer;
     
     int r = 0;
     while (r < 1) {
-        r = read(0, &buffer, 1);
+        r = read(fd, &buffer, 1);
     }
     
     return buffer;
@@ -50,32 +88,31 @@ static unsigned char convertToDoomKey(unsigned int key)
     key = tolower(key);
     switch (key)
     {
-        case '\n':
-            key = KEY_ENTER;
-            break;
-        case '\b':
-            key = KEY_ESCAPE;
-            break;
-        case 'h':
+        case 'a':
             key = KEY_LEFTARROW;
             break;
-        case 'l':
+        case 'd':
             key = KEY_RIGHTARROW;
             break;
-        case 'k':
+        case 'w':
             key = KEY_UPARROW;
             break;
-        case 'j':
+        case 's':
             key = KEY_DOWNARROW;
-            break;
-        case 'n':
-            key = KEY_FIRE;
-            break;
-        case ' ':
-            key = KEY_USE;
             break;
     }
     return key;
+}
+
+static uint8_t scanCodeToKey(uint8_t scancode)
+{
+    uint8_t key_scancode = ((uint8_t)scancode) & ~0x80;
+
+    if (key_scancode > sizeof(scancode_map) / sizeof(*scancode_map)) {
+        return 0x00;
+    }
+
+    return scancode_map[key_scancode];
 }
 
 static void addKeyToQueue(int pressed, unsigned int keyCode)
@@ -115,11 +152,18 @@ static void stop_thread(HTHREAD thread)
 static void handleKeyInput()
 {
     char c;
+    HFILE kbd_fd = open("/dev/kbd0", 0);
+    if (kbd_fd == (HFILE)-1) {
+        printf("Can't open keyboard device!\n");
+        exit(1);
+    }
     while (!should_exit) {
-        c = getch();
-        addKeyToQueue(1, c);
-        usleep(100000);
-        addKeyToQueue(0, c);
+        c = getch(kbd_fd);
+        if (c & 0x80) {
+            addKeyToQueue(0, scanCodeToKey(c));
+        } else {
+            addKeyToQueue(1, scanCodeToKey(c));
+        }
     }
     stop_thread(-1);
 }
