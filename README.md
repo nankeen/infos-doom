@@ -28,7 +28,7 @@ The two main hurdles as of 12 Mar 2021 are:
 - [x] Add framebuffer console output and font rendering.
 - [x] Add user space memory allocator.
 - [x] Implement frame drawing function in Doom.
-- [ ] Implement player input functions in Doom.
+- [x] Implement player input functions in Doom.
 - [ ] Add mouse device support (optional).
 
 ## Build
